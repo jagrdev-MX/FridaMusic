@@ -48,7 +48,7 @@ fun App(audioScanner: AudioScanner? = null, audioPlayer: AudioPlayer? = null) {
             Box(modifier = Modifier.padding(padding)) {
                 when (currentScreen) {
                     "home" -> HomeScreen(audioScanner, audioPlayer)
-                    "player" -> PlayerScreen()
+                    "player" -> PlayerScreen(audioPlayer)
                     "library" -> LibraryScreen()
                     "mixer" -> MixerScreen()
                 }

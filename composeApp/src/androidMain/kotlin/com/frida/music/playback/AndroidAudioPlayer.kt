@@ -9,8 +9,17 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.frida.music.domain.AudioPlayer
 import com.frida.music.domain.AudioTrack
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
+    private val _currentTrack = MutableStateFlow<AudioTrack?>(null)
+    override val currentTrack: StateFlow<AudioTrack?> = _currentTrack.asStateFlow()
+
+    private val _isPlaying = MutableStateFlow(false)
+    override val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
+
     private var browserFuture: ListenableFuture<MediaController>? = null
     private val controller: MediaController?
         get() = if (browserFuture?.isDone == true) browserFuture?.get() else null
@@ -24,6 +33,8 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
     }
 
     override fun play(track: AudioTrack) {
+        _currentTrack.value = track
+        _isPlaying.value = true
         controller?.let { player ->
             val mediaItem = MediaItem.fromUri(track.uri)
             player.setMediaItem(mediaItem)
@@ -33,14 +44,17 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
     }
 
     override fun pause() {
+        _isPlaying.value = false
         controller?.pause()
     }
 
     override fun resume() {
+        _isPlaying.value = true
         controller?.play()
     }
 
     override fun stop() {
+        _isPlaying.value = false
         controller?.stop()
     }
 }

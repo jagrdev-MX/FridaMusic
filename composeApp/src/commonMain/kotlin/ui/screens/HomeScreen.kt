@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -66,6 +67,7 @@ fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
                         MusicCard(
                             title = track.title, 
                             subtitle = track.artist,
+                            coverUri = track.coverArtUri,
                             onClick = { audioPlayer?.play(track) }
                         )
                     }
@@ -105,12 +107,16 @@ fun HeroSection() {
 }
 
 @Composable
-fun MusicCard(title: String, subtitle: String, onClick: () -> Unit = {}) {
+fun MusicCard(title: String, subtitle: String, coverUri: String?, onClick: () -> Unit = {}) {
     Column(modifier = Modifier.width(140.dp).clickable { onClick() }) {
-        Box(
+        coil3.compose.AsyncImage(
+            model = coverUri,
+            contentDescription = "Album Art",
             modifier = Modifier
                 .size(140.dp)
-                .background(SurfaceHigh, RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(24.dp))
+                .background(SurfaceHigh),
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
