@@ -22,6 +22,9 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
             implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.media3.exoplayer)
+            implementation(libs.androidx.media3.session)
+            implementation("com.google.guava:guava:31.1-android")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
