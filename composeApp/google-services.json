@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "520654541615",
+    "project_id": "fridamusic-25bf8pollito",
+    "storage_bucket": "fridamusic-25bf8pollito.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520654541615:android:afadfba1cd410de9e047da",
+        "android_client_info": {
+          "package_name": "com.jagrdev.frida"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNtBDxgixAOB3bONseqfgxC5uYIpRqzVs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
