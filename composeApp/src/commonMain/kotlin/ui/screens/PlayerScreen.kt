@@ -1,15 +1,20 @@
 package ui.screens
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -26,30 +31,55 @@ fun PlayerScreen(audioPlayer: AudioPlayer?) {
     val isPlaying by audioPlayer?.isPlaying?.collectAsState(false) ?: remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF1A1A2E), Color(0xFF16213E))
-                )
-            )
-            .padding(24.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
+        // Dynamic Blurred Background
+        if (currentTrack?.coverArtUri != null) {
+            coil3.compose.AsyncImage(
+                model = currentTrack?.coverArtUri,
+                contentDescription = "Background",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(70.dp), // Strong glassmorphism blur
+                contentScale = ContentScale.Crop
+            )
+            // Overlay to make text readable and blend with controls
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.85f)
+                            )
+                        )
+                    )
+            )
+        } else {
+            // Fallback gradient
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Brush.verticalGradient(listOf(Color(0xFF1A1A2E), Color(0xFF16213E))))
+            )
+        }
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(24.dp)
         ) {
             Spacer(modifier = Modifier.height(48.dp))
             
-            // Album Art
+            // Static Album Art
             coil3.compose.AsyncImage(
                 model = currentTrack?.coverArtUri,
                 contentDescription = "Album Art",
                 modifier = Modifier
                     .size(300.dp)
                     .clip(RoundedCornerShape(32.dp))
-                    .background(Color.DarkGray),
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    .background(Color.DarkGray.copy(alpha = 0.5f)),
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.height(48.dp))
@@ -71,13 +101,15 @@ fun PlayerScreen(audioPlayer: AudioPlayer?) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Controls
+            // Premium Controls with Vector Icons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("⏮", color = Color.White, style = MaterialTheme.typography.headlineMedium)
+                IconButton(onClick = { /* Previous */ }) {
+                    Icon(Icons.Rounded.ArrowBack, contentDescription = "Previous", tint = Color.White, modifier = Modifier.size(40.dp))
+                }
                 
                 Surface(
                     shape = CircleShape,
@@ -89,26 +121,35 @@ fun PlayerScreen(audioPlayer: AudioPlayer?) {
                         }
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(if (isPlaying) "⏸" else "▶", color = Color.White, style = MaterialTheme.typography.headlineMedium)
+                        Icon(
+                            imageVector = if (isPlaying) Icons.Rounded.Close else Icons.Rounded.PlayArrow,
+                            contentDescription = "Play/Pause", 
+                            tint = Color.White,
+                            modifier = Modifier.size(48.dp)
+                        )
                     }
                 }
 
-                Text("⏭", color = Color.White, style = MaterialTheme.typography.headlineMedium)
+                IconButton(onClick = { /* Next */ }) {
+                    Icon(Icons.Rounded.ArrowForward, contentDescription = "Next", tint = Color.White, modifier = Modifier.size(40.dp))
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
             
-            // Cloud Sync Placeholder
+            // Minimalist Cloud Sync Button
             Button(
                 onClick = { /* Sync Cloud */ },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = SurfaceHigh.copy(alpha = 0.5f))
+                colors = ButtonDefaults.buttonColors(containerColor = SurfaceHigh.copy(alpha = 0.4f))
             ) {
-                Text("Backup to Cloud (Firebase)", color = GradientEnd)
+                Icon(Icons.Rounded.CheckCircle, contentDescription = "Cloud", tint = GradientEnd, modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Respaldar en la Nube", color = GradientEnd)
             }
             
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

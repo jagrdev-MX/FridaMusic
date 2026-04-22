@@ -3,38 +3,35 @@ package ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ui.theme.GradientStart
 
 @Composable
 fun LibraryScreen() {
-    Scaffold(
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { /* Cloud Sync */ },
-                containerColor = GradientStart,
-                contentColor = Color.White,
-                icon = { Text("☁️") },
-                text = { Text("Sync with Cloud") }
-            )
-        }
-    ) { padding ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(24.dp)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(horizontal = 24.dp)
         ) {
             item {
+                Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = "Library",
-                    style = MaterialTheme.typography.headlineLarge,
+                    text = "Tu Biblioteca",
+                    style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -43,7 +40,24 @@ fun LibraryScreen() {
             items(10) {
                 LibraryItem("Playlist #${it + 1}", "Local Storage")
             }
+            
+            // Espacio extra para que el MiniPlayer y la Nav Bar no tapen el contenido
+            item {
+                Spacer(modifier = Modifier.height(180.dp))
+            }
         }
+
+        // Botón flotante de Sync (ahora realmente flota sobre la Nav Bar)
+        ExtendedFloatingActionButton(
+            onClick = { /* Cloud Sync */ },
+            containerColor = GradientStart,
+            contentColor = Color.White,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 100.dp, end = 24.dp), // Lo subimos para que no choque con la nav bar
+            icon = { Icon(Icons.Rounded.Refresh, contentDescription = "Sync") },
+            text = { Text("Sync with Cloud") }
+        )
     }
 }
 
