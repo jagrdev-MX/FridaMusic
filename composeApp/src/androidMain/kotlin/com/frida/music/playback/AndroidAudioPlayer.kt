@@ -57,4 +57,26 @@ class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
         _isPlaying.value = false
         controller?.stop()
     }
+
+    override fun setEqualizerBand(band: Int, level: Float) {
+        val extras = android.os.Bundle().apply {
+            putInt("band", band)
+            putFloat("level", level)
+        }
+        controller?.sendCustomCommand(androidx.media3.session.SessionCommand("SET_EQ_BAND", android.os.Bundle.EMPTY), extras)
+    }
+
+    override fun setBassBoost(level: Float) {
+        val extras = android.os.Bundle().apply {
+            putFloat("level", level)
+        }
+        controller?.sendCustomCommand(androidx.media3.session.SessionCommand("SET_BASS_BOOST", android.os.Bundle.EMPTY), extras)
+    }
+
+    override fun setSurround(level: Float) {
+        val extras = android.os.Bundle().apply {
+            putFloat("level", level)
+        }
+        controller?.sendCustomCommand(androidx.media3.session.SessionCommand("SET_SURROUND", android.os.Bundle.EMPTY), extras)
+    }
 }

@@ -20,7 +20,6 @@ import com.frida.music.domain.AudioScanner
 import com.frida.music.domain.AudioTrack
 import ui.screens.*
 import ui.theme.FridaMusicTheme
-import ui.theme.SurfaceHigh
 
 @Composable
 fun App(audioScanner: AudioScanner? = null, audioPlayer: AudioPlayer? = null) {
@@ -28,12 +27,12 @@ fun App(audioScanner: AudioScanner? = null, audioPlayer: AudioPlayer? = null) {
         var currentScreen by remember { mutableStateOf("home") }
         val currentTrack by audioPlayer?.currentTrack?.collectAsState() ?: remember { mutableStateOf<AudioTrack?>(null) }
         val isPlaying by audioPlayer?.isPlaying?.collectAsState() ?: remember { mutableStateOf(false) }
-        
+        val colors = MaterialTheme.colorScheme
+
         Scaffold(
-            containerColor = Color.Transparent, // Fondo transparente para ver el gradiente
+            containerColor = colors.background,
         ) { padding ->
             Box(modifier = Modifier.fillMaxSize()) {
-                // El contenido ahora llena toda la pantalla por debajo de las barras
                 when (currentScreen) {
                     "home" -> HomeScreen(audioScanner, audioPlayer)
                     "player" -> PlayerScreen(audioPlayer)
@@ -41,7 +40,6 @@ fun App(audioScanner: AudioScanner? = null, audioPlayer: AudioPlayer? = null) {
                     "mixer" -> MixerScreen()
                 }
 
-                // Global Mini Player above bottom navigation
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -51,24 +49,27 @@ fun App(audioScanner: AudioScanner? = null, audioPlayer: AudioPlayer? = null) {
                         MiniPlayer(
                             track = currentTrack!!,
                             isPlaying = isPlaying,
-                            onPlayPause = { 
-                                if (isPlaying) audioPlayer?.pause() else audioPlayer?.resume() 
+                            onPlayPause = {
+                                if (isPlaying) audioPlayer?.pause() else audioPlayer?.resume()
                             },
                             onClick = { currentScreen = "player" },
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
 
-                    // --- BARRA DE NAVEGACIÓN FLOTANTE (GLASS EFFECT) ---
+                    // ── FLOATING NAV BAR ──
                     Surface(
                         modifier = Modifier
                             .padding(horizontal = 24.dp, vertical = 12.dp)
                             .fillMaxWidth()
                             .height(64.dp),
                         shape = RoundedCornerShape(32.dp),
-                        color = Color.Black.copy(alpha = 0.4f), // Transparencia base
-                        border = androidx.compose.foundation.BorderStroke(0.5.dp, Color.White.copy(alpha = 0.1f)),
-                        tonalElevation = 8.dp
+                        color = colors.surface,
+                        shadowElevation = 8.dp,
+                        border = androidx.compose.foundation.BorderStroke(
+                            0.5.dp, colors.outline.copy(alpha = 0.3f)
+                        ),
+                        tonalElevation = 4.dp
                     ) {
                         Row(
                             modifier = Modifier.fillMaxSize(),
@@ -89,6 +90,7 @@ fun App(audioScanner: AudioScanner? = null, audioPlayer: AudioPlayer? = null) {
 
 @Composable
 fun NavItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, isSelected: Boolean, onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
@@ -100,7 +102,7 @@ fun NavItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = if (isSelected) Color.White else Color.Gray.copy(alpha = 0.7f),
+            tint = if (isSelected) colors.primary else colors.onSurfaceVariant,
             modifier = Modifier.size(if (isSelected) 28.dp else 24.dp)
         )
     }
@@ -108,20 +110,21 @@ fun NavItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String
 
 @Composable
 fun MiniPlayer(
-    track: AudioTrack, 
-    isPlaying: Boolean, 
-    onPlayPause: () -> Unit, 
+    track: AudioTrack,
+    isPlaying: Boolean,
+    onPlayPause: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        color = Color(0xFF1E1E1E).copy(alpha = 0.8f), // Glassy dark
-        tonalElevation = 4.dp
+        color = colors.surfaceVariant,
+        shadowElevation = 4.dp
     ) {
         Row(
             modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
@@ -131,7 +134,7 @@ fun MiniPlayer(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color.DarkGray)
+                    .background(colors.outline.copy(alpha = 0.3f))
             ) {
                 coil3.compose.AsyncImage(
                     model = track.coverArtUri,
@@ -144,7 +147,7 @@ fun MiniPlayer(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = track.title,
-                    color = Color.White,
+                    color = colors.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
@@ -152,7 +155,7 @@ fun MiniPlayer(
                 )
                 Text(
                     text = track.artist,
-                    color = Color.Gray,
+                    color = colors.onSurfaceVariant,
                     style = MaterialTheme.typography.labelSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -162,7 +165,7 @@ fun MiniPlayer(
                 Icon(
                     imageVector = if (isPlaying) Icons.Rounded.Close else Icons.Rounded.PlayArrow,
                     contentDescription = "Play/Pause",
-                    tint = Color.White,
+                    tint = colors.onSurface,
                     modifier = Modifier.size(32.dp)
                 )
             }

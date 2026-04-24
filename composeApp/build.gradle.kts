@@ -20,8 +20,8 @@ android {
         applicationId = "com.jagrdev.frida"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 5
-        versionName = "0.0.5"
+        versionCode = 6
+        versionName = "0.0.6"
     }
 
     packaging {
@@ -54,7 +54,10 @@ dependencies {
     implementation(compose.ui)
     implementation(compose.components.resources)
     implementation(libs.coil.compose)
-    
+
+    // Material Icons Extended (SkipNext, Pause, Shuffle, etc.)
+    implementation("androidx.compose.material:material-icons-extended")
+
     // Android Specific
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)

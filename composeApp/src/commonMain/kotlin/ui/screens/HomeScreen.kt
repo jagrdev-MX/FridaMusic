@@ -14,9 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -26,15 +24,12 @@ import androidx.compose.ui.unit.sp
 import com.frida.music.domain.AudioPlayer
 import com.frida.music.domain.AudioScanner
 import com.frida.music.domain.AudioTrack
-import ui.theme.GradientEnd
-import ui.theme.GradientStart
-import ui.theme.SurfaceHigh
 
 @Composable
 fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
     var tracks by remember { mutableStateOf<List<AudioTrack>>(emptyList()) }
     var searchQuery by remember { mutableStateOf("") }
-    val currentTrack by audioPlayer?.currentTrack?.collectAsState(null) ?: remember { mutableStateOf(null) }
+    val colors = MaterialTheme.colorScheme
 
     LaunchedEffect(audioScanner) {
         if (audioScanner != null) {
@@ -42,18 +37,11 @@ fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
         }
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(
-            Brush.verticalGradient(
-                colors = listOf(
-                    if (currentTrack != null) Color(0xFF3E2723) else Color(0xFF121212), // Tono café/rojizo si hay música, negro si no
-                    Color(0xFF000000)
-                )
-            )
-        )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background)
     ) {
-        // --- CONTENIDO PRINCIPAL ---
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -62,7 +50,6 @@ fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
         ) {
             item {
                 Spacer(modifier = Modifier.height(16.dp))
-                // Top App Bar
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -70,15 +57,15 @@ fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
                 ) {
                     Text(
                         text = "FridaMusic",
-                        style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onBackground
+                        style = MaterialTheme.typography.displaySmall,
+                        color = colors.onBackground
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        IconButton(onClick = { /* TODO: Notifications */ }) {
-                            Icon(Icons.Rounded.Notifications, contentDescription = "Notifications", tint = Color.White)
+                        IconButton(onClick = { }) {
+                            Icon(Icons.Rounded.Notifications, contentDescription = "Notifications", tint = colors.onBackground)
                         }
-                        IconButton(onClick = { /* TODO: Profile */ }) {
-                            Icon(Icons.Rounded.AccountCircle, contentDescription = "Profile", tint = Color.White)
+                        IconButton(onClick = { }) {
+                            Icon(Icons.Rounded.AccountCircle, contentDescription = "Profile", tint = colors.onBackground)
                         }
                     }
                 }
@@ -86,19 +73,18 @@ fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
             }
 
             item {
-                // Elegant Search Bar
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Buscar tu música...") },
-                    leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = "Search", tint = Color.Gray) },
+                    leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = "Search", tint = colors.onSurfaceVariant) },
                     shape = CircleShape,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = GradientStart,
-                        unfocusedBorderColor = SurfaceHigh,
-                        focusedContainerColor = SurfaceHigh.copy(alpha = 0.5f),
-                        unfocusedContainerColor = SurfaceHigh.copy(alpha = 0.3f),
+                        focusedBorderColor = colors.primary,
+                        unfocusedBorderColor = colors.outline,
+                        focusedContainerColor = colors.surfaceVariant.copy(alpha = 0.5f),
+                        unfocusedContainerColor = colors.surfaceVariant.copy(alpha = 0.3f),
                     ),
                     singleLine = true
                 )
@@ -106,7 +92,6 @@ fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
             }
 
             item {
-                // Pill Chips
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     item { CategoryChip("Todo", isSelected = true) }
                     item { CategoryChip("Favoritos", isSelected = false) }
@@ -122,12 +107,11 @@ fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
             }
 
             item {
-                // Quick Actions
-                Text("Accesos Rápidos", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = Color.White)
+                Text("Accesos Rápidos", style = MaterialTheme.typography.titleLarge, color = colors.onBackground)
                 Spacer(modifier = Modifier.height(16.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    item { QuickActionCard(Icons.Rounded.Favorite, "Me Gusta", GradientStart) }
-                    item { QuickActionCard(Icons.Rounded.PlayArrow, "Aleatorio", Color(0xFF6A1B9A), onClick = { 
+                    item { QuickActionCard(Icons.Rounded.Favorite, "Me Gusta", colors.primary) }
+                    item { QuickActionCard(Icons.Rounded.PlayArrow, "Aleatorio", Color(0xFF6A1B9A), onClick = {
                         if (tracks.isNotEmpty()) audioPlayer?.play(tracks.random())
                     }) }
                     item { QuickActionCard(Icons.Rounded.Refresh, "Recientes", Color(0xFF0277BD)) }
@@ -136,18 +120,21 @@ fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
             }
 
             item {
-                Text("Tu Colección Local", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = Color.White)
+                Text("Tu Colección Local", style = MaterialTheme.typography.titleLarge, color = colors.onBackground)
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 val filteredTracks = tracks.filter { it.title.contains(searchQuery, ignoreCase = true) || it.artist.contains(searchQuery, ignoreCase = true) }
-                
+
                 if (filteredTracks.isEmpty()) {
-                    Text(if (tracks.isEmpty()) "Buscando tu música local..." else "No se encontraron resultados", color = Color.Gray)
+                    Text(
+                        if (tracks.isEmpty()) "Buscando tu música local..." else "No se encontraron resultados",
+                        color = colors.onSurfaceVariant
+                    )
                 } else {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         items(filteredTracks) { track ->
                             MusicCard(
-                                title = track.title, 
+                                title = track.title,
                                 subtitle = track.artist,
                                 coverUri = track.coverArtUri,
                                 onClick = { audioPlayer?.play(track) }
@@ -163,15 +150,16 @@ fun HomeScreen(audioScanner: AudioScanner?, audioPlayer: AudioPlayer?) {
 
 @Composable
 fun CategoryChip(text: String, isSelected: Boolean) {
+    val colors = MaterialTheme.colorScheme
     Surface(
         shape = CircleShape,
-        color = if (isSelected) GradientStart else SurfaceHigh,
-        modifier = Modifier.clickable { /* TODO */ }
+        color = if (isSelected) colors.primary else colors.surfaceVariant,
+        modifier = Modifier.clickable { }
     ) {
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-            color = Color.White,
+            color = if (isSelected) Color.White else colors.onSurfaceVariant,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
     }
@@ -193,6 +181,7 @@ fun QuickActionCard(icon: androidx.compose.ui.graphics.vector.ImageVector, title
 
 @Composable
 fun HeroSection() {
+    val colors = MaterialTheme.colorScheme
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -202,16 +191,12 @@ fun HeroSection() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(GradientStart, GradientEnd)
-                    )
-                )
+                .background(colors.primary)
                 .padding(24.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             Column {
-                Text("Desbloquea Premium", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = Color.White)
+                Text("Desbloquea Premium", style = MaterialTheme.typography.titleLarge, color = Color.White)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Sin anuncios, y máxima calidad.", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.9f))
                 Spacer(modifier = Modifier.weight(1f))
@@ -229,6 +214,7 @@ fun HeroSection() {
 
 @Composable
 fun MusicCard(title: String, subtitle: String, coverUri: String?, onClick: () -> Unit = {}) {
+    val colors = MaterialTheme.colorScheme
     Column(modifier = Modifier.width(140.dp).clickable { onClick() }) {
         coil3.compose.AsyncImage(
             model = coverUri,
@@ -236,21 +222,21 @@ fun MusicCard(title: String, subtitle: String, coverUri: String?, onClick: () ->
             modifier = Modifier
                 .size(140.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .background(SurfaceHigh),
+                .background(colors.surfaceVariant),
             contentScale = ContentScale.Crop
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = title, 
-            fontWeight = FontWeight.Bold, 
-            color = Color.White,
+            text = title,
+            fontWeight = FontWeight.Bold,
+            color = colors.onBackground,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
         Text(
-            text = subtitle, 
-            fontSize = 12.sp, 
-            color = Color.Gray,
+            text = subtitle,
+            fontSize = 12.sp,
+            color = colors.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

@@ -12,14 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ui.theme.GradientStart
 
 @Composable
 fun LibraryScreen() {
+    val colors = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(colors.background)
     ) {
         LazyColumn(
             modifier = Modifier
@@ -31,30 +31,28 @@ fun LibraryScreen() {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = "Tu Biblioteca",
-                    style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = colors.onBackground
                 )
                 Spacer(modifier = Modifier.height(24.dp))
             }
-            
+
             items(10) {
                 LibraryItem("Playlist #${it + 1}", "Local Storage")
             }
-            
-            // Espacio extra para que el MiniPlayer y la Nav Bar no tapen el contenido
+
             item {
                 Spacer(modifier = Modifier.height(180.dp))
             }
         }
 
-        // Botón flotante de Sync (ahora realmente flota sobre la Nav Bar)
         ExtendedFloatingActionButton(
-            onClick = { /* Cloud Sync */ },
-            containerColor = GradientStart,
+            onClick = { },
+            containerColor = colors.primary,
             contentColor = Color.White,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 100.dp, end = 24.dp), // Lo subimos para que no choque con la nav bar
+                .padding(bottom = 100.dp, end = 24.dp),
             icon = { Icon(Icons.Rounded.Refresh, contentDescription = "Sync") },
             text = { Text("Sync with Cloud") }
         )
@@ -63,15 +61,16 @@ fun LibraryScreen() {
 
 @Composable
 fun LibraryItem(name: String, subtitle: String) {
+    val colors = MaterialTheme.colorScheme
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier.size(60.dp).background(Color.DarkGray))
+        Box(modifier = Modifier.size(60.dp).background(colors.surfaceVariant))
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = name, color = Color.White)
-            Text(text = subtitle, color = Color.Gray)
+            Text(text = name, color = colors.onBackground)
+            Text(text = subtitle, color = colors.onSurfaceVariant)
         }
     }
 }
